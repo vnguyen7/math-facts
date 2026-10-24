@@ -10,9 +10,77 @@
 .ruler-help{font-size:12px;color:#5a6f88;margin:9px 0 0}
 .settings{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:20px 0}.settings label{display:grid;text-align:left;font-size:13px;gap:4px}.question{font-size:clamp(42px,10vw,75px);font-weight:850;margin:22px}.answers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.answers button{font-size:32px;padding:22px;background:#eae7ff;color:#332a84}.answers button:hover{background:#d3ccff}.stats{display:flex;justify-content:space-around;font-weight:700;margin:16px 0}.feedback{min-height:32px;font-weight:800;font-size:23px}.dots{font-size:28px;line-height:1.6;overflow-wrap:anywhere}.muted{color:#68718a}.hidden{display:none}.small{font-size:13px}#restart{margin-top:15px;background:#19a18b}.settings select,.settings input{max-width:180px;background:#fff}.answers button:disabled{opacity:.6;cursor:default}.summary{font-size:24px;font-weight:800;color:#6053c9;margin:16px 0}
 .workspace{margin:18px 0;text-align:left;background:#f7fbff;border:2px solid #d7e8fa;border-radius:18px;padding:12px}.workspace-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.workspace-head strong{color:#34466e}.workspace-tools{display:flex;gap:8px;flex-wrap:wrap}.workspace-tools button{padding:9px 13px;font-size:14px;background:#e6e8ff;color:#3d3389}.workspace-tools button.active{background:#6758db;color:white}#scratch{width:100%;height:260px;display:block;background-color:white;background-image:linear-gradient(#e5effb 1px,transparent 1px);background-size:100% 32px;border:1px solid #bfd4ed;border-radius:12px;touch-action:none;cursor:crosshair;margin-top:10px}.workspace-note{font-size:12px;color:#64748b;margin:8px 0 0}.hidden{display:none!important}.settings label{min-width:120px}.question{overflow-wrap:anywhere}@media(max-width:500px){.app{width:100%;box-sizing:border-box;padding:15px;border-radius:0}.settings label{flex:1 1 135px}.answers button{padding:16px}}
-</style></head><body><main class="app"><h1>🌈 Math Adventure</h1><p class="muted">Practice math, earn stars, and have fun!</p><section class="number-line" aria-label="Counting number line from zero to ten"><div class="number-line-title">🔢 My Counting Ruler: 0 to 10</div><div id="ruler" class="ruler"></div><p id="ruler-help" class="ruler-help">Tap a number as you count!</p></section><div class="settings"><label>Player name<input id="player" maxlength="20" placeholder="Your name" value="Math Star"></label><label>Math type<select id="operation"><option value="add">➕ Addition</option><option value="subtract">➖ Subtraction</option><option value="multiply">✖️ Multiplication</option><option value="divide">➗ Division</option></select></label><label>Fact family<select id="fact"><option value="all">Mixed facts</option><option value="0">0 facts</option><option value="1">1 facts</option><option value="2">2 facts</option><option value="3">3 facts</option><option value="4">4 facts</option><option value="5">5 facts</option><option value="6">6 facts</option><option value="7">7 facts</option><option value="8">8 facts</option><option value="9">9 facts</option><option value="10">10 facts</option></select></label><label id="multiplication-mode-label" class="hidden">Multiplication practice<select id="multiplication-mode"><option value="facts">Basic facts</option><option value="2digit">2-digit × 1-digit</option><option value="3digit">3-digit × 1-digit</option></select></label><label id="carrying-label" class="hidden">Regrouping<select id="carrying"><option value="mixed">Mixed</option><option value="no">Without carrying</option><option value="yes">With carrying</option></select></label><label>Difficulty<select id="level"><option value="easy">Easy (0–10)</option><option value="medium">Medium (0–20)</option><option value="hard">Hard (0–50)</option></select></label><label>Problems<select id="count"><option value="10">10 problems</option><option value="20" selected>20 problems</option><option value="30">30 problems</option></select></label></div><div class="stats"><span id="score">⭐ 0 stars</span><span id="progress">Question 1</span><span id="streak">🔥 0 streak</span></div><div id="question" class="question" aria-live="polite"></div><div id="dots" class="dots" aria-label="Counting dots"></div><section class="workspace" aria-label="Writing workspace"><div class="workspace-head"><strong>✏️ Show your work</strong><div class="workspace-tools"><button type="button" id="pen" class="active">✏️ Pen</button><button type="button" id="eraser">🧽 Eraser</button><button type="button" id="undo">↶ Undo</button><button type="button" id="clear">Clear</button></div></div><canvas id="scratch" aria-label="Drawing pad for solving the math problem">Your browser does not support the drawing pad.</canvas><p class="workspace-note">Write with your finger or Apple Pencil. Choose an answer below when ready. The workspace clears on the next question.</p></section><div id="answers" class="answers"></div><div id="feedback" class="feedback" role="status" aria-live="polite"></div><button id="restart">🔄 New game</button><p class="small muted">Choose “2 facts” for basic facts, or select 2-digit / 3-digit multiplication and write your work on the iPad. Division uses whole-number answers. No account needed. Best results are saved on this device.</p></main><script>
+
+/* iPad layout: left problem and answers, right handwriting workspace */
+.practice-layout{display:contents}
+@media (min-width: 740px) and (orientation: landscape){
+ body{display:block;min-height:100dvh}
+ .app{box-sizing:border-box;width:100%;max-width:1500px;min-height:100dvh;margin:0 auto;border-radius:0;padding:16px 26px}
+ .app>h1{font-size:28px}.app>p.muted{margin:5px 0}
+ .number-line{margin:8px 0;padding:9px 12px}
+ .settings{margin:8px 0;gap:7px}.settings label{font-size:12px}.settings select,.settings input{padding:7px}
+ .stats{margin:8px 0}
+ .practice-layout{display:grid;grid-template-columns:minmax(290px,0.9fr) minmax(390px,1.35fr);gap:18px;align-items:stretch;text-align:center}
+ .problem-panel,.writing-panel{min-width:0;display:flex;flex-direction:column}
+ .problem-panel{grid-column:1;grid-row:1}
+ .writing-panel{grid-column:2;grid-row:1}
+ .question{font-size:clamp(42px,5vw,76px);margin:12px 0}
+ .workspace{margin:0;flex:1;display:flex;flex-direction:column}
+ #scratch{flex:1;min-height:320px;height:clamp(320px,44vh,650px)}
+ .answers{margin-top:12px}.answers button{padding:14px;font-size:26px}
+ .feedback{margin-top:8px}#restart{align-self:center}
+}
+@media (min-width: 740px) and (orientation: landscape) and (max-height:650px){
+ .app{padding:8px 18px}.number-line{margin:4px 0}.settings{margin:4px 0}
+ #scratch{min-height:240px;height:38vh}.question{margin:5px 0}
+}
+
+.secondary-action{align-self:end;padding:9px 12px;border-radius:12px;border:2px solid #b4c9ee;background:#fff;color:#27467c;font-weight:750;cursor:pointer}
+.dashboard{background:#fff;border:2px solid #b4d6f6;border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 8px 25px #3453a017;text-align:left}
+.dash-head,.dash-filters,.dash-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.dash-head h2{margin:0}.dash-filters{justify-content:flex-start;margin:12px 0}.dash-filters label{display:grid;gap:4px}
+.dash-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px;margin:12px 0}
+.metric{border-radius:12px;background:#edf5ff;padding:12px}.metric strong{display:block;font-size:23px}.metric span{font-size:12px;color:#4b6387}
+.fact-row{padding:9px 2px;border-bottom:1px solid #e4edf7}.fact-row .track{height:9px;background:#e7edf6;border-radius:12px;overflow:hidden;margin-top:5px}.fact-row .fill{height:100%;background:#5f9fdc}
+.dash-list{max-height:230px;overflow:auto}.dash-item{padding:8px 4px;border-bottom:1px solid #e4edf7;font-size:14px}
+.dash-actions{justify-content:flex-start;margin-top:15px}.dash-actions button,.dash-head button{padding:9px 12px;border-radius:10px;border:1px solid #afc6e8;background:#f4f8ff;color:#25416c}
+.dashboard.hidden{display:none!important}
+@media(max-width:600px){.dashboard{padding:12px}.secondary-action{align-self:stretch}}
+</style></head><body><main class="app"><h1>🌈 Math Adventure</h1><p class="muted">Practice math, earn stars, and have fun!</p><section class="number-line" aria-label="Counting number line from zero to ten"><div class="number-line-title">🔢 My Counting Ruler: 0 to 10</div><div id="ruler" class="ruler"></div><p id="ruler-help" class="ruler-help">Tap a number as you count!</p></section><div class="settings"><label>Child profile<select id="player"><option value="Child 1">Child 1</option><option value="Child 2">Child 2</option></select></label><button type="button" id="add-child" class="secondary-action">+ Add child</button><button type="button" id="dashboard-toggle" class="secondary-action">📊 Parent dashboard</button><label>Math type<select id="operation"><option value="add">➕ Addition</option><option value="subtract">➖ Subtraction</option><option value="multiply">✖️ Multiplication</option><option value="divide">➗ Division</option></select></label><label>Fact family<select id="fact"><option value="all">Mixed facts</option><option value="0">0 facts</option><option value="1">1 facts</option><option value="2">2 facts</option><option value="3">3 facts</option><option value="4">4 facts</option><option value="5">5 facts</option><option value="6">6 facts</option><option value="7">7 facts</option><option value="8">8 facts</option><option value="9">9 facts</option><option value="10">10 facts</option></select></label><label id="multiplication-mode-label" class="hidden">Multiplication practice<select id="multiplication-mode"><option value="facts">Basic facts</option><option value="2digit">2-digit × 1-digit</option><option value="3digit">3-digit × 1-digit</option></select></label><label id="carrying-label" class="hidden">Regrouping<select id="carrying"><option value="mixed">Mixed</option><option value="no">Without carrying</option><option value="yes">With carrying</option></select></label><label>Difficulty<select id="level"><option value="easy">Easy (0–10)</option><option value="medium">Medium (0–20)</option><option value="hard">Hard (0–50)</option></select></label><label>Problems<select id="count"><option value="10">10 problems</option><option value="20" selected>20 problems</option><option value="30">30 problems</option></select></label></div><div class="stats"><span id="score">⭐ 0 stars</span><span id="progress">Question 1</span><span id="streak">🔥 0 streak</span></div><section id="dashboard" class="dashboard hidden" aria-label="Parent progress dashboard"><div class="dash-head"><h2>📊 Parent Dashboard</h2><button type="button" id="close-dashboard">Close</button></div><p class="muted small">Saved on this device only. Correct means answered on the first try. A fact family is mastered after at least 20 first-try answers over 2 days with 90% accuracy.</p><div class="dash-filters"><label>Child<select id="dash-child"></select></label><label>Period<select id="dash-period"><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="all">All time</option></select></label></div><div id="dash-summary" class="dash-summary"></div><h3>Fact family mastery</h3><div id="dash-facts"></div><h3>Questions to review</h3><div id="dash-mistakes"></div><h3>Recent sessions</h3><div id="dash-sessions"></div><div class="dash-actions"><button type="button" id="export-progress">⬇ Export backup (JSON)</button><button type="button" id="export-csv">⬇ Export CSV</button><button type="button" id="import-progress">⬆ Import backup</button><input id="import-file" type="file" accept="application/json,.json" class="hidden"><button type="button" id="clear-progress">Delete selected child history</button></div></section><div class="practice-layout"><section class="problem-panel"><div id="question" class="question" aria-live="polite"></div><div id="dots" class="dots" aria-label="Counting dots"></div><section class="workspace" aria-label="Writing workspace"><div class="workspace-head"><strong>✏️ Show your work</strong><div class="workspace-tools"><button type="button" id="pen" class="active">✏️ Pen</button><button type="button" id="eraser">🧽 Eraser</button><button type="button" id="undo">↶ Undo</button><button type="button" id="clear">Clear</button></div></div><canvas id="scratch" aria-label="Drawing pad for solving the math problem">Your browser does not support the drawing pad.</canvas><p class="workspace-note">Write with your finger or Apple Pencil. Choose an answer below when ready. The workspace clears on the next question.</p></section></section><section class="writing-panel"><div id="answers" class="answers"></div><div id="feedback" class="feedback" role="status" aria-live="polite"></div><button id="restart">🔄 New game</button></section></div><p class="small muted">Choose “2 facts” for basic facts, or select 2-digit / 3-digit multiplication and write your work on the iPad. Division uses whole-number answers. No account needed. Scores and first-try mistakes are saved on this device. Use the Parent Dashboard to export backups.</p></main><script>
 const $=id=>document.getElementById(id);
 let a=0,b=0,correct=0,score=0,streak=0,number=0,locked=false,finished=false,advanceTimer=null;
+let firstTry=true,questionStarted=Date.now(),sessionAttempts=[],sessionStarted=Date.now(),sessionProfile="Child 1";
+const STORE='math-adventure-progress-v6';
+function getData(){try{const v=JSON.parse(localStorage.getItem(STORE)||'null');return v&&Array.isArray(v.profiles)&&Array.isArray(v.sessions)?v:{profiles:['Child 1','Child 2'],sessions:[]}}catch{return {profiles:['Child 1','Child 2'],sessions:[]}}}
+let history=getData();
+function persist(){try{localStorage.setItem(STORE,JSON.stringify(history));return true}catch{alert('Progress could not be saved. Device storage may be full or disabled.');return false}}
+function profiles(){const current=$('player').value;const dash=$('dash-child').value;for(const id of ['player','dash-child']){$(id).replaceChildren(...history.profiles.map(name=>{const o=document.createElement('option');o.value=name;o.textContent=name;return o}))}if(history.profiles.includes(current))$('player').value=current;if(history.profiles.includes(dash))$('dash-child').value=dash}
+function category(){const op=$('operation').value;const multi=$('multiplication-mode').value;return op==='multiply'&&multi!=='facts'?`${multi==='2digit'?'2-digit':'3-digit'} × 1-digit (${$('carrying').value})`:`${{add:'Addition',subtract:'Subtraction',multiply:'Multiplication',divide:'Division'}[op]} · ${$('fact').value==='all'?'Mixed':$('fact').value+'s'}`}
+function recordAttempt(){sessionAttempts.push({a,b,op:$('operation').value,correct,firstTry,elapsedMs:Date.now()-questionStarted,category:category(),time:new Date().toISOString()})}
+function saveSession(completed){if(!sessionAttempts.length)return;history.sessions.push({id:Date.now()+'-'+Math.random().toString(36).slice(2,8),profile:sessionProfile,started:new Date(sessionStarted).toISOString(),ended:new Date().toISOString(),completed,attempts:sessionAttempts.slice()});history.sessions=history.sessions.slice(-1500);persist();sessionAttempts=[]}
+function safeText(el,value){el.textContent=String(value)}
+function dateSince(days){return days==='all'?0:Date.now()-Number(days)*86400000}
+function dashboard(){const child=$('dash-child').value,cutoff=dateSince($('dash-period').value);const sessions=history.sessions.filter(s=>s.profile===child&&Date.parse(s.ended)>=cutoff);const attempts=sessions.flatMap(s=>s.attempts||[]);const right=attempts.filter(x=>x.firstTry).length;const accuracy=attempts.length?Math.round(right/attempts.length*100):0;const time=Math.round(attempts.reduce((n,x)=>n+(x.elapsedMs||0),0)/60000);
+ $('dash-summary').replaceChildren();for(const [v,label] of [[sessions.length,'Sessions'],[attempts.length,'Problems solved'],[accuracy+'%','First-try accuracy'],[time+' min','Time on questions']]){const box=document.createElement('div');box.className='metric';const big=document.createElement('strong'),small=document.createElement('span');safeText(big,v);safeText(small,label);box.append(big,small);$('dash-summary').append(box)}
+ const groups=new Map();for(const x of attempts){if(!groups.has(x.category))groups.set(x.category,[]);groups.get(x.category).push(x)}
+ $('dash-facts').replaceChildren();if(!groups.size)$('dash-facts').textContent='No practice recorded yet.';
+ for(const [name,rows] of [...groups].sort((a,b)=>a[0].localeCompare(b[0]))){const recent=rows.slice(-20),pct=Math.round(recent.filter(x=>x.firstTry).length/recent.length*100);const days=new Set(recent.map(x=>x.time.slice(0,10))).size;const mastered=recent.length>=20&&days>=2&&pct>=90;const el=document.createElement('div');el.className='fact-row';const t=document.createElement('div');t.textContent=`${name}: ${pct}% (${recent.length}/20 recent) — ${mastered?'🏆 Mastered':recent.length<20?'Keep practicing':pct>=90?'Practice another day':'Needs practice'}`;const track=document.createElement('div');track.className='track';const fill=document.createElement('div');fill.className='fill';fill.style.width=pct+'%';track.append(fill);el.append(t,track);$('dash-facts').append(el)}
+ $('dash-mistakes').replaceChildren();const misses=attempts.filter(x=>!x.firstTry).slice(-30).reverse();if(!misses.length)$('dash-mistakes').textContent='No missed first attempts in this period.';for(const x of misses){const el=document.createElement('div');el.className='dash-item';el.textContent=`${x.a} ${{add:'+',subtract:'−',multiply:'×',divide:'÷'}[x.op]} ${x.b} = ${x.correct} · ${x.category}`;$('dash-mistakes').append(el)}
+ $('dash-sessions').replaceChildren();for(const s of sessions.slice(-20).reverse()){const el=document.createElement('div');el.className='dash-item';const total=s.attempts.length,correct=s.attempts.filter(x=>x.firstTry).length;el.textContent=`${new Date(s.ended).toLocaleDateString()} · ${correct}/${total} first try · ${s.completed?'Completed':'Partial'}`;$('dash-sessions').append(el)}if(!sessions.length)$('dash-sessions').textContent='No sessions yet.';
+}
+function exportFile(filename,content,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)}
+function csvCell(v){return '"'+String(v??'').replaceAll('"','""')+'"'}
+function exportCSV(){const lines=[['Child','Date','Operation','Category','Question','Answer','First try','Seconds'].map(csvCell).join(',')];for(const s of history.sessions)for(const x of s.attempts){const symbol={add:'+',subtract:'-',multiply:'x',divide:'/'}[x.op];lines.push([s.profile,x.time,x.op,x.category,`${x.a} ${symbol} ${x.b}`,x.correct,x.firstTry?'Yes':'No',Math.round(x.elapsedMs/1000)].map(csvCell).join(','))}exportFile('math-adventure-progress.csv',lines.join('\r\n'),'text/csv')}
+$('add-child').onclick=()=>{const name=prompt('Enter child name (up to 25 characters):');if(name===null)return;const clean=name.trim().slice(0,25);if(!clean||history.profiles.includes(clean))return alert('Please enter a unique name.');saveSession(false);history.profiles.push(clean);persist();profiles();$('player').value=clean;$('dash-child').value=clean;start()};
+$('dashboard-toggle').onclick=()=>{saveSession(false);$('dashboard').classList.remove('hidden');$('dash-child').value=$('player').value;dashboard()};
+$('close-dashboard').onclick=()=>{$('dashboard').classList.add('hidden')};
+$('dash-child').onchange=dashboard;$('dash-period').onchange=dashboard;
+$('export-progress').onclick=()=>exportFile('math-adventure-backup.json',JSON.stringify(history,null,2),'application/json');
+$('export-csv').onclick=exportCSV;
+$('import-progress').onclick=()=>$('import-file').click();
+$('import-file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const v=JSON.parse(await f.text());if(!Array.isArray(v.profiles)||!Array.isArray(v.sessions)||!v.profiles.every(x=>typeof x==='string')||v.sessions.length>10000)throw Error('Invalid backup');if(!confirm('Replace all existing progress with this backup?'))return;history=v;persist();profiles();dashboard();start()}catch{alert('This is not a valid Math Adventure backup.')}finally{e.target.value=''}};
+$('clear-progress').onclick=()=>{const child=$('dash-child').value;if(!confirm(`Permanently delete saved sessions for ${child}? Export a backup first if needed.`))return;history.sessions=history.sessions.filter(s=>s.profile!==child);persist();dashboard()};
+profiles();
 const rand=n=>Math.floor(Math.random()*(n+1));
 const canvas=$('scratch'),ctx=canvas.getContext('2d');
 let strokes=[],activeStroke=null,tool='pen',drawingPointer=null;
@@ -105,7 +173,7 @@ function makeProblem(){
 }
 function next(){
  if(finished)return;
- locked=false;markRuler(null);clearCanvas();number++;$('feedback').textContent='';makeProblem();update();
+ locked=false;markRuler(null);clearCanvas();number++;firstTry=true;questionStarted=Date.now();$('feedback').textContent='';makeProblem();update();
 }
 function save(){
  try{
@@ -115,7 +183,7 @@ function save(){
  }catch(e){}
 }
 function finish(){
- finished=true;locked=true;save();
+ finished=true;locked=true;save();saveSession(true);
  const total=Number($('count').value),percent=Math.round(score/total*100);
  $('question').textContent='🏆 Great work!';$('dots').textContent='';$('answers').replaceChildren();
  $('feedback').textContent=`${$('player').value||'Math Star'}, you got ${score} / ${total} correct (${percent}%)!`;
@@ -124,18 +192,18 @@ function finish(){
 function answer(n){
  if(locked||finished)return;
  if(n===correct){
-  locked=true;score++;streak++;
+  locked=true;recordAttempt();score++;streak++;
   $('feedback').textContent=['🎉 Great job!','🌟 Amazing!','🥳 You got it!'][rand(2)];
   update();
   if(number>=Number($('count').value))advanceTimer=setTimeout(finish,850);
   else advanceTimer=setTimeout(next,850);
  }else{
-  streak=0;$('feedback').textContent='💪 Try again!';update();
+  firstTry=false;streak=0;$('feedback').textContent='💪 Try again!';update();
  }
 }
 function start(){
  if(advanceTimer!==null)clearTimeout(advanceTimer);
- advanceTimer=null;finished=false;locked=false;markRuler(null);
+ advanceTimer=null;if(!finished)saveSession(false);sessionStarted=Date.now();sessionProfile=$('player').value;finished=false;locked=false;markRuler(null);
  updateMultiplicationSettings();score=0;streak=0;number=0;next();
 }
 $('restart').onclick=start;

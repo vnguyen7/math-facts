@@ -1,4 +1,4 @@
-const CACHE = 'math-adventure-pwa-v1';
+const CACHE = 'math-adventure-pwa-v6-landscape';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
