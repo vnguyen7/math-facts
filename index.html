@@ -1,0 +1,145 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Math Adventure</title><style>:root{font-family:system-ui,sans-serif;color:#24304b}body{margin:0;background:linear-gradient(135deg,#dff7ff,#fff0d7);min-height:100vh;display:grid;place-items:center}.app{width:min(92vw,620px);background:white;border-radius:28px;padding:26px;box-shadow:0 16px 50px #30406022;text-align:center}h1{margin:0;color:#6053c9}button,select,input{font:inherit;border-radius:14px;padding:12px;border:2px solid #ddd}button{cursor:pointer;background:#6758db;color:white;border:0;font-weight:750}button:focus-visible{outline:4px solid orange}.number-line{margin:16px 0 20px;padding:14px 10px;background:#f0f9ff;border-radius:18px}
+.number-line-title{font-weight:800;font-size:15px;margin-bottom:10px;color:#37517b}
+.ruler{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));position:relative;gap:0}
+.ruler::before{content:"";position:absolute;top:12px;left:4.5%;right:4.5%;height:4px;background:#92b9d9;border-radius:5px}
+.ruler button{position:relative;z-index:1;min-width:0;padding:0;border:0;background:transparent;color:#304c74;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:clamp(13px,3vw,20px);font-weight:850}
+.ruler .tick{width:4px;height:23px;background:#5e94bf;border-radius:3px}
+.ruler button.active .tick{background:#f39c12;width:7px;height:28px}
+.ruler button.active .num{background:#ffd36e;color:#654000;border-radius:10px;padding:1px 4px}
+.ruler button:focus-visible{outline:3px solid #f39c12;outline-offset:3px}
+.ruler-help{font-size:12px;color:#5a6f88;margin:9px 0 0}
+.settings{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:20px 0}.settings label{display:grid;text-align:left;font-size:13px;gap:4px}.question{font-size:clamp(42px,10vw,75px);font-weight:850;margin:22px}.answers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.answers button{font-size:32px;padding:22px;background:#eae7ff;color:#332a84}.answers button:hover{background:#d3ccff}.stats{display:flex;justify-content:space-around;font-weight:700;margin:16px 0}.feedback{min-height:32px;font-weight:800;font-size:23px}.dots{font-size:28px;line-height:1.6;overflow-wrap:anywhere}.muted{color:#68718a}.hidden{display:none}.small{font-size:13px}#restart{margin-top:15px;background:#19a18b}.settings select,.settings input{max-width:180px;background:#fff}.answers button:disabled{opacity:.6;cursor:default}.summary{font-size:24px;font-weight:800;color:#6053c9;margin:16px 0}
+.workspace{margin:18px 0;text-align:left;background:#f7fbff;border:2px solid #d7e8fa;border-radius:18px;padding:12px}.workspace-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.workspace-head strong{color:#34466e}.workspace-tools{display:flex;gap:8px;flex-wrap:wrap}.workspace-tools button{padding:9px 13px;font-size:14px;background:#e6e8ff;color:#3d3389}.workspace-tools button.active{background:#6758db;color:white}#scratch{width:100%;height:260px;display:block;background-color:white;background-image:linear-gradient(#e5effb 1px,transparent 1px);background-size:100% 32px;border:1px solid #bfd4ed;border-radius:12px;touch-action:none;cursor:crosshair;margin-top:10px}.workspace-note{font-size:12px;color:#64748b;margin:8px 0 0}.hidden{display:none!important}.settings label{min-width:120px}.question{overflow-wrap:anywhere}@media(max-width:500px){.app{width:100%;box-sizing:border-box;padding:15px;border-radius:0}.settings label{flex:1 1 135px}.answers button{padding:16px}}
+</style></head><body><main class="app"><h1>🌈 Math Adventure</h1><p class="muted">Practice math, earn stars, and have fun!</p><section class="number-line" aria-label="Counting number line from zero to ten"><div class="number-line-title">🔢 My Counting Ruler: 0 to 10</div><div id="ruler" class="ruler"></div><p id="ruler-help" class="ruler-help">Tap a number as you count!</p></section><div class="settings"><label>Player name<input id="player" maxlength="20" placeholder="Your name" value="Math Star"></label><label>Math type<select id="operation"><option value="add">➕ Addition</option><option value="subtract">➖ Subtraction</option><option value="multiply">✖️ Multiplication</option><option value="divide">➗ Division</option></select></label><label>Fact family<select id="fact"><option value="all">Mixed facts</option><option value="0">0 facts</option><option value="1">1 facts</option><option value="2">2 facts</option><option value="3">3 facts</option><option value="4">4 facts</option><option value="5">5 facts</option><option value="6">6 facts</option><option value="7">7 facts</option><option value="8">8 facts</option><option value="9">9 facts</option><option value="10">10 facts</option></select></label><label id="multiplication-mode-label" class="hidden">Multiplication practice<select id="multiplication-mode"><option value="facts">Basic facts</option><option value="2digit">2-digit × 1-digit</option><option value="3digit">3-digit × 1-digit</option></select></label><label id="carrying-label" class="hidden">Regrouping<select id="carrying"><option value="mixed">Mixed</option><option value="no">Without carrying</option><option value="yes">With carrying</option></select></label><label>Difficulty<select id="level"><option value="easy">Easy (0–10)</option><option value="medium">Medium (0–20)</option><option value="hard">Hard (0–50)</option></select></label><label>Problems<select id="count"><option value="10">10 problems</option><option value="20" selected>20 problems</option><option value="30">30 problems</option></select></label></div><div class="stats"><span id="score">⭐ 0 stars</span><span id="progress">Question 1</span><span id="streak">🔥 0 streak</span></div><div id="question" class="question" aria-live="polite"></div><div id="dots" class="dots" aria-label="Counting dots"></div><section class="workspace" aria-label="Writing workspace"><div class="workspace-head"><strong>✏️ Show your work</strong><div class="workspace-tools"><button type="button" id="pen" class="active">✏️ Pen</button><button type="button" id="eraser">🧽 Eraser</button><button type="button" id="undo">↶ Undo</button><button type="button" id="clear">Clear</button></div></div><canvas id="scratch" aria-label="Drawing pad for solving the math problem">Your browser does not support the drawing pad.</canvas><p class="workspace-note">Write with your finger or Apple Pencil. Choose an answer below when ready. The workspace clears on the next question.</p></section><div id="answers" class="answers"></div><div id="feedback" class="feedback" role="status" aria-live="polite"></div><button id="restart">🔄 New game</button><p class="small muted">Choose “2 facts” for basic facts, or select 2-digit / 3-digit multiplication and write your work on the iPad. Division uses whole-number answers. No account needed. Best results are saved on this device.</p></main><script>
+const $=id=>document.getElementById(id);
+let a=0,b=0,correct=0,score=0,streak=0,number=0,locked=false,finished=false,advanceTimer=null;
+const rand=n=>Math.floor(Math.random()*(n+1));
+const canvas=$('scratch'),ctx=canvas.getContext('2d');
+let strokes=[],activeStroke=null,tool='pen',drawingPointer=null;
+function renderCanvas(){
+ const rect=canvas.getBoundingClientRect(),ratio=window.devicePixelRatio||1;
+ const w=Math.max(1,Math.round(rect.width*ratio)),h=Math.max(1,Math.round(rect.height*ratio));
+ if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
+ ctx.clearRect(0,0,w,h);ctx.lineCap='round';ctx.lineJoin='round';
+ for(const stroke of strokes){if(!stroke.points.length)continue;
+  ctx.beginPath();ctx.strokeStyle=stroke.tool==='eraser'?'#ffffff':'#273b75';ctx.lineWidth=(stroke.tool==='eraser'?24:3.2)*ratio;
+  stroke.points.forEach((point,i)=>{const x=point.x*w,y=point.y*h;if(i===0){ctx.moveTo(x,y);ctx.lineTo(x+.01,y+.01)}else ctx.lineTo(x,y)});ctx.stroke();
+ }
+}
+function pointFor(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height}}
+canvas.addEventListener('pointerdown',e=>{if(finished)return;e.preventDefault();canvas.setPointerCapture(e.pointerId);drawingPointer=e.pointerId;activeStroke={tool,points:[pointFor(e)]};strokes.push(activeStroke);renderCanvas()});
+canvas.addEventListener('pointermove',e=>{if(!activeStroke || e.pointerId!==drawingPointer)return;e.preventDefault();activeStroke.points.push(pointFor(e));renderCanvas()});
+function stopDrawing(){activeStroke=null;drawingPointer=null}
+canvas.addEventListener('pointerup',stopDrawing);canvas.addEventListener('pointercancel',stopDrawing);
+$('pen').onclick=()=>setTool('pen');$('eraser').onclick=()=>setTool('eraser');
+function setTool(value){tool=value;$('pen').classList.toggle('active',tool==='pen');$('eraser').classList.toggle('active',tool==='eraser')}
+$('undo').onclick=()=>{strokes.pop();renderCanvas()};$('clear').onclick=clearCanvas;
+function clearCanvas(){strokes=[];activeStroke=null;drawingPointer=null;renderCanvas()}
+window.addEventListener('resize',renderCanvas);
+function updateMultiplicationSettings(){const multi=$('operation').value==='multiply';$('multiplication-mode-label').classList.toggle('hidden',!multi);const advanced=multi&&$('multiplication-mode').value!=='facts';$('carrying-label').classList.toggle('hidden',!advanced);$('fact').parentElement.classList.toggle('hidden',advanced);$('level').parentElement.classList.toggle('hidden',advanced)}
+function needsCarry(x,y){let n=x;while(n>0){if((n%10)*y>=10)return true;n=Math.floor(n/10)}return false}
+
+function markRuler(n){
+ document.querySelectorAll('#ruler button').forEach(btn=>{
+  const active=n!==null && Number(btn.dataset.number)===n;
+  btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));
+ });
+ $('ruler-help').textContent=n===null?'Tap a number as you count!':`You are on ${n}. Keep counting!`;
+}
+for(let n=0;n<=10;n++){
+ const btn=document.createElement('button');btn.type='button';btn.dataset.number=n;
+ btn.setAttribute('aria-label',`Number ${n}`);
+ btn.innerHTML='<span class="tick"></span><span class="num">'+n+'</span>';
+ btn.onclick=()=>markRuler(n);$('ruler').appendChild(btn);
+}
+markRuler(null);
+function update(){
+ $('score').textContent='⭐ '+score+' / '+number+' correct';
+ $('streak').textContent='🔥 '+streak+' streak';
+ $('progress').textContent='Question '+number+' / '+$('count').value;
+}
+function makeProblem(){
+ const op=$('operation').value, level=$('level').value;
+ const max=level==='easy'?10:level==='medium'?20:50;
+ const factor=level==='easy'?5:level==='medium'?10:12;
+ const fixed=$('fact').value==='all'?null:Number($('fact').value);
+ if(op==='multiply' && $('multiplication-mode').value!=='facts'){
+  const digits=$('multiplication-mode').value==='2digit'?2:3;
+  const low=10**(digits-1),high=10**digits-1;
+  const carry=$('carrying').value;
+  let found=false;
+  for(let i=0;i<1500;i++){
+   const x=low+rand(high-low),y=1+rand(8);
+   if(carry==='mixed'||needsCarry(x,y)===(carry==='yes')){a=x;b=y;found=true;break}
+  }
+  if(!found){a=carry==='no'?low:low+5;b=carry==='no'?2:3}
+  correct=a*b;
+ }else if(op==='add'){
+  if(fixed!==null){a=fixed;b=rand(max);correct=a+b;}
+  else{correct=rand(max);a=rand(correct);b=correct-a;}
+ }else if(op==='subtract'){
+  if(fixed!==null){b=fixed;correct=rand(max);a=b+correct;}
+  else{a=rand(max);b=rand(a);correct=a-b;}
+ }else if(op==='multiply'){
+  a=fixed===null?rand(factor):fixed;b=rand(factor);correct=a*b;
+ }else{
+  b=fixed===null?1+rand(factor-1):fixed;
+  if(b===0){b=1;correct=0;a=0;}
+  else{correct=rand(factor);a=b*correct;}
+ }
+ const symbol={add:'+',subtract:'−',multiply:'×',divide:'÷'}[op];
+ $('question').textContent=`${a} ${symbol} ${b} = ?`;
+ $('dots').textContent=op==='add' && a+b<=10?'🔵'.repeat(a)+'  '+'🟡'.repeat(b):'';
+ let options=new Set([correct]);
+ const spread=op==='multiply'||op==='divide'?Math.max(10,Math.ceil(correct*.5)):Math.max(10,max);
+ let tries=0;
+ while(options.size<4 && tries++<100){
+  let candidate=Math.max(0,correct+rand(spread*2)-spread);
+  options.add(candidate);
+ }
+ for(let n=0;options.size<4;n++)options.add(n);
+ const choices=[...options].sort(()=>Math.random()-.5);
+ $('answers').replaceChildren(...choices.map(n=>{
+  const btn=document.createElement('button');btn.textContent=n;btn.onclick=()=>answer(n);return btn;
+ }));
+}
+function next(){
+ if(finished)return;
+ locked=false;markRuler(null);clearCanvas();number++;$('feedback').textContent='';makeProblem();update();
+}
+function save(){
+ try{
+  const key='math-adventure-best:'+($('player').value||'Math Star')+':'+$('operation').value+':'+$('level').value+':'+$('fact').value+':'+$('multiplication-mode').value+':'+$('carrying').value+':'+$('count').value;
+  const previous=Number(localStorage.getItem(key)||0);
+  if(score>previous)localStorage.setItem(key,String(score));
+ }catch(e){}
+}
+function finish(){
+ finished=true;locked=true;save();
+ const total=Number($('count').value),percent=Math.round(score/total*100);
+ $('question').textContent='🏆 Great work!';$('dots').textContent='';$('answers').replaceChildren();
+ $('feedback').textContent=`${$('player').value||'Math Star'}, you got ${score} / ${total} correct (${percent}%)!`;
+ $('progress').textContent='Finished '+total+' / '+total;
+}
+function answer(n){
+ if(locked||finished)return;
+ if(n===correct){
+  locked=true;score++;streak++;
+  $('feedback').textContent=['🎉 Great job!','🌟 Amazing!','🥳 You got it!'][rand(2)];
+  update();
+  if(number>=Number($('count').value))advanceTimer=setTimeout(finish,850);
+  else advanceTimer=setTimeout(next,850);
+ }else{
+  streak=0;$('feedback').textContent='💪 Try again!';update();
+ }
+}
+function start(){
+ if(advanceTimer!==null)clearTimeout(advanceTimer);
+ advanceTimer=null;finished=false;locked=false;markRuler(null);
+ updateMultiplicationSettings();score=0;streak=0;number=0;next();
+}
+$('restart').onclick=start;
+$('operation').addEventListener('change',updateMultiplicationSettings);$('multiplication-mode').addEventListener('change',updateMultiplicationSettings);
+ for(const id of ['operation','level','fact','count','player','multiplication-mode','carrying'])$(id).onchange=start;
+start();
+</script></body></html>
